@@ -12,7 +12,7 @@ samples: rrbs_sample.txt #rrbs_jpermain.txt
 trimming:
     perform: True
     # any extra arguments submitted to trim_galore
-    extra: "--rrbs --non-directional" #"--rrbs" #--rrbs is default because this pipeline is specifically for rrbs sequencing
+    extra: "--rrbs --non_directional" #"--rrbs" #--rrbs is default because this pipeline is specifically for rrbs sequencing
 
 # should phiX removal be performed?
 # would need a phiX index to run

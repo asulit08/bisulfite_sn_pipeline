@@ -2,3 +2,4 @@ genomes/*
 test_runs/*
 sample_sheets/*
 ._*
+.snakemake/*
