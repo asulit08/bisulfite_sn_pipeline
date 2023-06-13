@@ -143,7 +143,8 @@ rule phix_rem:
         btin = get_data_for_phiX
     output:
         btsam = temp(join(DIR_RES, "phix_rem/{sample}/{sample}.sam")),
-        btun = join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem")
+        btun1 = join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.1"),
+	btun2 = join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.2")
     priority: 20
     log:
         join(DIR_LOGS, "phix_rem/{sample}_phixrem.log")
@@ -151,24 +152,26 @@ rule phix_rem:
         join(DIR_BENCHMARKS, "phix_rem/{sample}_phixrem.txt")
     threads: 4
     params:
-        phi_index,
+        phi_index=phi_index,
+	btun = join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem")
     conda:
         join(DIR_ENVS, "rrbs.yaml")
     shell:
-        "nice bowtie2 -p {threads} -x {params} -1 {input.btin[0]} -2 {input.btin[1]} --un-conc-gz {output.btun} -S {output.btsam} > {log} 2>&1"
+        "nice bowtie2 -p {threads} -x {params.phi_index} -1 {input.btin[0]} -2 {input.btin[1]} --un-conc-gz {params.btun} -S {output.btsam} > {log} 2>&1"
 
 ## 2.1 ##phix unmapped outputs doesn't come in gz, so just rename to have .gz
 rule rename_phi_un:
     input: 
-        rules.phix_rem.output.btun
+        rules.phix_rem.output.btun1,
+	rules.phix_rem.output.btun2
     priority: 20
     output:
         un1 =  temp(join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.1.fq.gz")),
         un2 =  temp(join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.2.fq.gz"))
     shell:
         """
-        mv {input}.1 > {output.un1}
-        mv {input}.2 > {output.un2}
+        mv {input[0]} > {output.un1}
+        mv {input[1]} > {output.un2}
         """
 
 ## 3. bismark run ; constrain resources because they said this could blow up cores and I don't want to blow servers up when they are used simultaneously
