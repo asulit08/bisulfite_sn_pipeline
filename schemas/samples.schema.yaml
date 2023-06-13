@@ -1,0 +1,22 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+
+description: an entry in the sample sheet
+
+properties:
+  sample:
+    type: string
+    description: sample name/identifier
+
+  read1:
+    type: string
+    description: For paired end, this contains the first of the pairs (mate1, F1, etc)
+
+  read2:
+    type: string
+    description: For paired end, this contains the second of the pairs (mate2, F2, etc)
+    
+  required:
+    - sample
+    - read1
+    - read2
+

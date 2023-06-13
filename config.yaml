@@ -1,0 +1,33 @@
+resultdir: analyses ##resultdir
+
+# Specify sample sheet here
+# Expected are 3 columns:
+# 1) Sample Name: Name of sample (required)
+# 2) file_mate1: paired-end mate 1/forward read path
+# 3) file_mate2: paired-end mate2/reverse read path
+# NOTE: all columns required
+samples: rrbs_sample.txt #rrbs_jpermain.txt
+
+# should trimming be performed (trim_galore)?
+trimming:
+    perform: True
+    # any extra arguments submitted to trim_galore
+    extra: "--rrbs --non-directional" #"--rrbs" #--rrbs is default because this pipeline is specifically for rrbs sequencing
+
+# should phiX removal be performed?
+# would need a phiX index to run
+phi_rem:
+    perform: True
+    index: genomes/phiX/phix_illumina
+
+# bismark options; no asking if perform here because it is the standard to run
+bs_main:
+    bs_index: genomes/hg38_UCSC
+    bs_extra: "--non_directional --gzip"
+
+# bismark methylation extration options; this is also a required run
+bs_meth:
+        bs_meth_extra: "--gzip --no_overlap"
+
+bs_summary:
+        bs_summary_file: "JPermain_RRBSsummary"
