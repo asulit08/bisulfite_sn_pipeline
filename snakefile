@@ -166,8 +166,8 @@ rule rename_phi_un:
 	rules.phix_rem.output.btun2
     priority: 20
     output:
-        un1 =  temp(join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.1.fq.gz")),
-        un2 =  temp(join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.2.fq.gz"))
+        un1 = temp(join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.1.fq.gz")),
+        un2 = temp(join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.2.fq.gz"))
     shell:
         """
         mv {input[0]}  {output.un1}
