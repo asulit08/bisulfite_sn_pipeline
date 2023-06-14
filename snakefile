@@ -170,8 +170,8 @@ rule rename_phi_un:
         un2 =  temp(join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.2.fq.gz"))
     shell:
         """
-        mv {input[0]} > {output.un1}
-        mv {input[1]} > {output.un2}
+        mv {input[0]}  {output.un1}
+        mv {input[1]}  {output.un2}
         """
 
 ## 3. bismark run ; constrain resources because they said this could blow up cores and I don't want to blow servers up when they are used simultaneously
