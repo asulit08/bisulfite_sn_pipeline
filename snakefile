@@ -19,6 +19,8 @@ if config=={}:
     sys.stderr.write("Please submit config-file with --configfile <file>. Exit.\n")
     sys.exit(1)
 
+bs_sum_file = config["bs_summary"]["bs_summary_file"]
+
 trim_params = None
 if config["trimming"]["perform"]:
     trim_params = config["trimming"]["extra"]
@@ -109,8 +111,8 @@ bisfiles = expand(join(DIR_RES, "bismark/{sample}/{sample}_bs_pe.bam"), sample=S
 
 rule all:
     input: 
-        expand(join(DIR_RES, "bismark/{sample}/meth_extract/{sample}_meth_pe.bismark.cov.gz"),  sample=SAMPLES["sample"]),
-        join(join(DIR_RES, "bismark"), config["bs_summary"]["bs_summary_file"])
+        expand(join(DIR_RES, "bismark/{sample}/meth_extract/{sample}_bs_pe.bismark.cov.gz"),  sample=SAMPLES["sample"]), 
+        join(join(DIR_RES, "bismark"), "{}.txt".format(bs_sum_file)), join(join(DIR_RES, "bismark"), "{}.html".format(bs_sum_file))
     
 
 ## 1. trim with trim galore which has rrbs capabilities. note that --gzip is added to make sure that no matter the input file, output is gzipped for pipeline compatibility
@@ -144,7 +146,7 @@ rule phix_rem:
     output:
         btsam = temp(join(DIR_RES, "phix_rem/{sample}/{sample}.sam")),
         btun1 = join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.1"),
-	btun2 = join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.2")
+	    btun2 = join(DIR_RES, "phix_rem/{sample}/{sample}_phixrem.2")
     priority: 20
     log:
         join(DIR_LOGS, "phix_rem/{sample}_phixrem.log")
@@ -206,12 +208,12 @@ rule bismark_meth:
         rules.bismark_main.output.obam
     output: 
         bsmethdir = directory(join(DIR_RES, "bismark/{sample}/meth_extract")),
-        bdcovfiles = join(DIR_RES, "bismark/{sample}/meth_extract/{sample}_meth_pe.bismark.cov.gz")
+        bdcovfiles = join(DIR_RES, "bismark/{sample}/meth_extract/{sample}_bs_pe.bismark.cov.gz")
     #priority: 30
     log: 
         join(DIR_LOGS, "bismark/{sample}_bismark_meth.log")
     benchmark:
-        join(DIR_LOGS, "bismark/{sample}_bismark_meth.txt")
+        join(DIR_BENCHMARKS, "bismark/{sample}_bismark_meth.txt")
     params: 
         bs_meth_extra = config["bs_meth"]["bs_meth_extra"]
     conda:
@@ -225,12 +227,15 @@ rule bismark_summary:
     input: 
         bisfiles
     output:
-        join(join(DIR_RES, "bismark"), config["bs_summary"]["bs_summary_file"])
+        join(join(DIR_RES, "bismark"), "{}.txt".format(bs_sum_file)),
+        join(join(DIR_RES, "bismark"), "{}.html".format(bs_sum_file))
     log:
         join(DIR_LOGS, "bismark/summaryfile.log")
     benchmark:
         join(DIR_BENCHMARKS, "bismark/summaryfile.txt")
+    params:
+        join(join(DIR_RES, "bismark"), bs_sum_file)
     conda:
         join(DIR_ENVS, "rrbs.yaml")
     shell:
-        "nice bismark2summary {input} -o {output} > {log} 2>&1"
+        "nice bismark2summary {input} -o {params} > {log} 2>&1"
